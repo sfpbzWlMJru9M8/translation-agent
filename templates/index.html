@@ -277,13 +277,6 @@
             border: 1px solid var(--border-color);
         }
         
-        #thinkingProcess {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.6;
-            white-space: pre-wrap;
-        }
-        
         .translation-result-section {
             padding: 20px;
             background-color: var(--secondary-color);
@@ -350,25 +343,37 @@
         }
         
         .thinking-content {
+            width: 100%;
+            height: 60px;
             font-size: 14px;
             line-height: 1.6;
             color: #2c5282;
             white-space: pre-wrap;
-        }
-        
-        .thinking-content p {
-            margin: 0 0 8px 0;
-        }
-        
-        .thinking-content p:last-child {
+            padding: 16px;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: height 0.3s ease;
             margin-bottom: 0;
         }
         
-        #thinkingProcess {
-            background-color: #f8f9fa;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
+        .thinking-content p {
+            margin: 0;
+            padding: 0 0 8px 0;
+        }
+        
+        .thinking-content p:last-child {
+            padding-bottom: 0;
+        }
+        
+        .thinking-content.placeholder {
+            color: #999;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background-color: var(--secondary-color);
         }
         
         .analysis-section {
@@ -538,13 +543,31 @@
                                     if (data.content) {
                                         accumulatedThinking += data.content;
                                         thinkingDiv.classList.remove('placeholder');
-                                        thinkingDiv.innerHTML = `
-                                            <div class="thinking-content">
-                                                ${accumulatedThinking.split('\n').map(line => 
-                                                    `<p>${line}</p>`
-                                                ).join('')}
-                                            </div>
-                                        `;
+                                        // 实时处理思考链内容
+                                        let lines = accumulatedThinking.split('\n');
+                                        let currentLine = lines[lines.length - 1] || '';
+                                        
+                                        // 如果是新行，添加新的 p 标签
+                                        if (data.content.includes('\n') || thinkingDiv.children.length === 0) {
+                                            lines.forEach((line, index) => {
+                                                // 只处理新行
+                                                if (index >= thinkingDiv.children.length) {
+                                                    const p = document.createElement('p');
+                                                    p.textContent = line;
+                                                    thinkingDiv.appendChild(p);
+                                                }
+                                            });
+                                        } else {
+                                            // 更新最后一行的内容
+                                            if (thinkingDiv.lastChild) {
+                                                thinkingDiv.lastChild.textContent = currentLine;
+                                            } else {
+                                                const p = document.createElement('p');
+                                                p.textContent = currentLine;
+                                                thinkingDiv.appendChild(p);
+                                            }
+                                        }
+                                        autoResize(thinkingDiv);
                                     }
                                     break;
                                     
@@ -582,9 +605,7 @@
                                     if (result.translation_reasoning) {
                                         explanationDiv.innerHTML = `
                                             <div class="explanation-detail">
-                                                ${result.translation_reasoning.split('\n').map(line => 
-                                                    `<p>${line}</p>`
-                                                ).join('')}
+                                                ${formatAnalysisContent(result.translation_reasoning)}
                                             </div>
                                         `;
                                     }
@@ -672,14 +693,45 @@
                 }
             });
 
-            // 添加文本框自动调整高度的功能
+            // 修改 autoResize 函数使其更通用
             function autoResize(element) {
                 element.style.height = 'auto';
                 const lineHeight = parseInt(window.getComputedStyle(element).lineHeight);
                 const minHeight = lineHeight * 2; // 两行的高度
                 const maxHeight = 400; // 最大高度
-                const newHeight = Math.min(Math.max(element.scrollHeight, minHeight), maxHeight);
+                
+                // 计算实际内容高度
+                let contentHeight;
+                if (element.classList.contains('thinking-content')) {
+                    // 对于思考链内容，计算所有子元素的总高度
+                    contentHeight = Array.from(element.children).reduce((total, p) => {
+                        const style = window.getComputedStyle(p);
+                        return total + p.offsetHeight + 
+                            parseInt(style.paddingTop) + 
+                            parseInt(style.paddingBottom);
+                    }, 0);
+                    // 添加容器的内边距
+                    contentHeight += parseInt(window.getComputedStyle(element).paddingTop) +
+                                   parseInt(window.getComputedStyle(element).paddingBottom);
+                    // 添加额外空间确保最后一行可见
+                    contentHeight += lineHeight / 2;
+                } else {
+                    contentHeight = element.scrollHeight;
+                }
+                
+                const newHeight = Math.min(Math.max(contentHeight, minHeight), maxHeight);
                 element.style.height = newHeight + 'px';
+                
+                // 如果内容超出最大高度，添加滚动
+                element.style.overflowY = contentHeight > maxHeight ? 'auto' : 'hidden';
+                
+                // 如果是思考链内容，自动滚动到底部
+                if (element.classList.contains('thinking-content') && 
+                    contentHeight > maxHeight) {
+                    element.scrollTop = element.scrollHeight;
+                    // 确保最后一行完全可见
+                    element.scrollTop += lineHeight;
+                }
             }
 
             // 为源文本框添加自动调整高度
@@ -698,6 +750,22 @@
             });
 
             observer.observe(resultDiv, {
+                childList: true,
+                characterData: true,
+                subtree: true
+            });
+
+            // 添加对思考链内容的监听
+            const thinkingObserver = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.target.id === 'thinkingProcess') {
+                        const element = mutation.target;
+                        autoResize(element);
+                    }
+                });
+            });
+            
+            thinkingObserver.observe(thinkingDiv, {
                 childList: true,
                 characterData: true,
                 subtree: true
