@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏翻译智能体</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #FF2442;
+            --secondary-color: #FFF6F6;
+            --text-color: #333333;
+            --border-color: #EBEDF0;
+            --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            background-color: #FAFAFA;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+        
+        .app-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        
+        .translation-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0;
+        }
+        
+        .language-controls {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background-color: var(--secondary-color);
+        }
+        
+        .language-select {
+            background: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            color: var(--text-color);
+            width: auto;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 28px;
+        }
+        
+        .swap-btn {
+            background: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 12px;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .swap-btn:hover {
+            transform: rotate(180deg);
+        }
+        
+        .text-area-container {
+            padding: 20px;
+        }
+        
+        .translation-box {
+            width: 100%;
+            height: 60px; /* 初始高度设为两行 */
+            border: none;
+            resize: none;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-color);
+            padding: 0;
+            margin-bottom: 20px;
+            overflow-y: hidden; /* 隐藏滚动条 */
+        }
+        
+        .translation-box:focus {
+            outline: none;
+        }
+        
+        .translation-box::placeholder {
+            color: #999;
+        }
+        
+        .result-box {
+            width: 100%;
+            min-height: 120px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-color);
+            white-space: pre-wrap;
+            padding: 0;
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 20px 0;
+        }
+        
+        .btn-translate {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 12px 32px;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-translate:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-translate i {
+            margin-right: 8px;
+        }
+        
+        #loadingSpinner {
+            display: none;
+            margin-left: 8px;
+        }
+        
+        @media (max-width: 576px) {
+            .app-container {
+                margin: 10px auto;
+            }
+            
+            .translation-card {
+                border-radius: 12px;
+            }
+            
+            .card-header {
+                padding: 12px 16px;
+            }
+            
+            .text-area-container {
+                padding: 16px;
+            }
+            
+            .btn-translate {
+                width: 100%;
+            }
+        }
+        
+        .result-section {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .result-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .result-header i {
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+        
+        .result-content, .thinking-content {
+            width: 100%;
+            height: 60px; /* 初始高度设为两行 */
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-color);
+            white-space: pre-wrap;
+            padding: 16px;
+            overflow-y: hidden; /* 隐藏滚动条 */
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+        }
+        
+        .result-content.placeholder, .thinking-content.placeholder {
+            color: #999;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .explanation-section {
+            padding: 20px;
+            background-color: #fff6f0;
+        }
+        
+        .explanation-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #666;
+            padding: 16px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .explanation-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        .explanation-detail {
+            margin-bottom: 12px;
+            color: #744210;
+        }
+        
+        .context-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border-radius: 12px;
+            font-size: 12px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .thinking-section {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .translation-section {
+            padding: 15px;
+            background-color: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        
+        #thinkingProcess {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .translation-result-section {
+            padding: 20px;
+            background-color: var(--secondary-color);
+            margin-top: 20px;
+            border-radius: 12px;
+            margin: 20px;
+        }
+        
+        .action-section {
+            padding: 20px;
+            text-align: center;
+            background-color: #fff;
+        }
+        
+        .text-area-container {
+            padding: 20px;
+            background-color: #fff;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .language-controls {
+            padding: 15px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .text-area-container {
+            padding: 20px;
+            background-color: #fff;
+        }
+        
+        .action-section {
+            padding: 15px 20px;
+            text-align: center;
+            background-color: #fff;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .translation-result-section {
+            padding: 20px;
+            background-color: var(--secondary-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .thinking-section {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .explanation-section {
+            padding: 20px;
+            background-color: #fff;
+        }
+        
+        .result-content {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            line-height: 1.6;
+            min-height: 60px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .thinking-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #2c5282;
+            white-space: pre-wrap;
+        }
+        
+        .thinking-content p {
+            margin: 0 0 8px 0;
+        }
+        
+        .thinking-content p:last-child {
+            margin-bottom: 0;
+        }
+        
+        #thinkingProcess {
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .analysis-section {
+            margin-bottom: 20px;
+        }
+        
+        .analysis-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 12px;
+        }
+        
+        .analysis-detail {
+            margin-left: 20px;
+            color: var(--text-color);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        
+        .analysis-paragraph {
+            color: var(--text-color);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        
+        .explanation-detail {
+            background-color: var(--secondary-color);
+            border-radius: 12px;
+            padding: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="translation-card">
+            <div class="card-header">
+                <h1 class="card-title">游戏翻译智能体</h1>
+            </div>
+            
+            <!-- 语言选择和输入部分 -->
+            <div class="language-controls">
+                <select class="language-select" id="sourceLang">
+                    <option value="英语">英语</option>
+                    <option value="中文">中文</option>
+                    <option value="日语">日语</option>
+                </select>
+                
+                <button class="swap-btn" id="swapLangBtn">
+                    <i class="fas fa-exchange-alt"></i>
+                </button>
+                
+                <select class="language-select" id="targetLang">
+                    <option value="中文">中文</option>
+                    <option value="英语">英语</option>
+                    <option value="日语">日语</option>
+                </select>
+            </div>
+            
+            <!-- 输入文本区域 -->
+            <div class="text-area-container">
+                <textarea class="translation-box" id="sourceText" 
+                    placeholder="请输入要翻译的文本..."></textarea>
+            </div>
+            
+            <!-- 翻译按钮 -->
+            <div class="action-section">
+                <button class="btn-translate" id="translateBtn">
+                    <i class="fas fa-language"></i>
+                    <span>翻译</span>
+                    <span id="loadingSpinner" class="spinner-border spinner-border-sm"></span>
+                </button>
+            </div>
+            
+            <!-- 翻译结果部分 -->
+            <div class="translation-result-section">
+                <div class="result-header">
+                    <i class="fas fa-language"></i>
+                    <span>翻译结果</span>
+                </div>
+                <div class="result-content placeholder" id="translationResult">
+                    翻译结果将显示在这里...
+                </div>
+            </div>
+            
+            <!-- 思考链内容部分 -->
+            <div class="thinking-section">
+                <div class="result-header">
+                    <i class="fas fa-brain"></i>
+                    <span>思考链</span>
+                </div>
+                <div class="thinking-content placeholder" id="thinkingProcess">
+                    思考链内容将显示在这里...
+                </div>
+            </div>
+            
+            <!-- 翻译解析部分 -->
+            <div class="explanation-section">
+                <div class="result-header">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>翻译解析</span>
+                </div>
+                <div class="explanation-content" id="translationExplanation">
+                    <div class="explanation-detail">翻译解析将显示在这里...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const translateBtn = document.getElementById('translateBtn');
+            const swapLangBtn = document.getElementById('swapLangBtn');
+            const sourceText = document.getElementById('sourceText');
+            const sourceLang = document.getElementById('sourceLang');
+            const targetLang = document.getElementById('targetLang');
+            const resultDiv = document.getElementById('translationResult');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const explanationDiv = document.getElementById('translationExplanation');
+            const thinkingDiv = document.getElementById('thinkingProcess');
+
+            // 添加累积变量
+            let accumulatedThinking = '';
+            let accumulatedAnalysis = '';
+            let currentTranslation = '';
+
+            // 翻译按钮点击事件
+            translateBtn.addEventListener('click', async function() {
+                if (!sourceText.value.trim()) {
+                    alert('请输入要翻译的文本');
+                    return;
+                }
+                
+                try {
+                    loadingSpinner.style.display = 'inline-block';
+                    resultDiv.textContent = '正在翻译...';
+                    resultDiv.classList.remove('placeholder');
+                    explanationDiv.innerHTML = '<div class="explanation-detail">正在分析...</div>';
+                    thinkingDiv.textContent = '正在思考...';
+                    thinkingDiv.classList.remove('placeholder');
+                    
+                    // 构建查询参数
+                    const params = new URLSearchParams({
+                        text: sourceText.value,
+                        source_lang: sourceLang.value,
+                        target_lang: targetLang.value
+                    });
+                    
+                    // 关闭之前的 SSE 连接（如果存在）
+                    if (window.translationEventSource) {
+                        window.translationEventSource.close();
+                    }
+                    
+                    // 创建新的 SSE 连接
+                    const eventSource = new EventSource(`/translate?${params.toString()}`);
+                    window.translationEventSource = eventSource;
+                    
+                    // 处理消息
+                    eventSource.onmessage = function(event) {
+                        try {
+                            const data = JSON.parse(event.data);
+                            console.log('Received data:', data);
+                            
+                            switch(data.type) {
+                                case 'thinking':
+                                    // 更新思考链内容
+                                    if (data.content) {
+                                        accumulatedThinking += data.content;
+                                        thinkingDiv.classList.remove('placeholder');
+                                        thinkingDiv.innerHTML = `
+                                            <div class="thinking-content">
+                                                ${accumulatedThinking.split('\n').map(line => 
+                                                    `<p>${line}</p>`
+                                                ).join('')}
+                                            </div>
+                                        `;
+                                    }
+                                    break;
+                                    
+                                case 'translation':
+                                    // 更新翻译结果
+                                    if (data.content) {
+                                        currentTranslation = data.content;
+                                        resultDiv.textContent = currentTranslation;
+                                        resultDiv.classList.remove('placeholder');
+                                    }
+                                    break;
+                                    
+                                case 'analysis':
+                                    // 更新翻译解析
+                                    if (data.content) {
+                                        accumulatedAnalysis = data.content;
+                                        explanationDiv.innerHTML = `
+                                            <div class="explanation-detail">
+                                                ${formatAnalysisContent(accumulatedAnalysis)}
+                                            </div>
+                                        `;
+                                    }
+                                    break;
+                                    
+                                case 'complete':
+                                    // 处理完整响应
+                                    const result = data.data;
+                                    
+                                    // 显示最终翻译结果
+                                    if (result.translation) {
+                                        resultDiv.textContent = result.translation;
+                                    }
+                                    
+                                    // 显示最终翻译解析
+                                    if (result.translation_reasoning) {
+                                        explanationDiv.innerHTML = `
+                                            <div class="explanation-detail">
+                                                ${result.translation_reasoning.split('\n').map(line => 
+                                                    `<p>${line}</p>`
+                                                ).join('')}
+                                            </div>
+                                        `;
+                                    }
+                                    
+                                    // 显示最终思考链内容
+                                    if (result.thinking_process) {
+                                        thinkingDiv.innerHTML = `
+                                            <div class="thinking-content">
+                                                ${result.thinking_process.split('\n').map(line => 
+                                                    `<p>${line}</p>`
+                                                ).join('')}
+                                            </div>
+                                        `;
+                                    }
+                                    
+                                    // 重置累积变量
+                                    accumulatedThinking = '';
+                                    accumulatedAnalysis = '';
+                                    currentTranslation = '';
+                                    
+                                    // 关闭连接
+                                    eventSource.close();
+                                    loadingSpinner.style.display = 'none';
+                                    break;
+                                    
+                                case 'error':
+                                    // 处理错误
+                                    resultDiv.textContent = `错误: ${data.content}`;
+                                    resultDiv.classList.remove('placeholder');
+                                    thinkingDiv.textContent = '思考过程中断';
+                                    thinkingDiv.classList.remove('placeholder');
+                                    explanationDiv.innerHTML = '<div class="explanation-detail">处理过程中发生错误</div>';
+                                    eventSource.close();
+                                    loadingSpinner.style.display = 'none';
+                                    break;
+                            }
+                        } catch (error) {
+                            console.error('Error parsing SSE data:', error, event.data);
+                            resultDiv.textContent = '处理响应时发生错误';
+                            explanationDiv.innerHTML = '<div class="explanation-detail">数据解析错误</div>';
+                            eventSource.close();
+                            loadingSpinner.style.display = 'none';
+                        }
+                    };
+                    
+                    // 处理连接错误
+                    eventSource.onerror = function(error) {
+                        console.error('SSE Error:', error);
+                        resultDiv.textContent = '连接错误，请重试';
+                        explanationDiv.innerHTML = '<div class="explanation-detail">连接发生错误</div>';
+                        eventSource.close();
+                        loadingSpinner.style.display = 'none';
+                    };
+                    
+                } catch (error) {
+                    console.error('Translation error:', error);
+                    resultDiv.textContent = `发生错误: ${error.message}`;
+                    explanationDiv.innerHTML = '<div class="explanation-detail">处理过程中发生错误</div>';
+                    loadingSpinner.style.display = 'none';
+                }
+            });
+
+            // 语言切换按钮点击事件
+            swapLangBtn.addEventListener('click', function() {
+                const sourceValue = sourceLang.value;
+                const targetValue = targetLang.value;
+                sourceLang.value = targetValue;
+                targetLang.value = sourceValue;
+                
+                // 如果已有翻译结果，也交换文本
+                const sourceContent = sourceText.value;
+                const targetContent = resultDiv.textContent;
+                if (targetContent && targetContent !== '翻译结果将显示在这里...' && 
+                    targetContent !== '正在翻译...' && !targetContent.startsWith('错误')) {
+                    sourceText.value = targetContent;
+                    resultDiv.textContent = sourceContent;
+                }
+            });
+
+            // 添加键盘快捷键支持
+            document.addEventListener('keydown', function(e) {
+                // Ctrl/Cmd + Enter 触发翻译
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    translateBtn.click();
+                }
+            });
+
+            // 添加文本框自动调整高度的功能
+            function autoResize(element) {
+                element.style.height = 'auto';
+                const lineHeight = parseInt(window.getComputedStyle(element).lineHeight);
+                const minHeight = lineHeight * 2; // 两行的高度
+                const maxHeight = 400; // 最大高度
+                const newHeight = Math.min(Math.max(element.scrollHeight, minHeight), maxHeight);
+                element.style.height = newHeight + 'px';
+            }
+
+            // 为源文本框添加自动调整高度
+            sourceText.addEventListener('input', function() {
+                autoResize(this);
+            });
+
+            // 监听翻译结果变化来调整结果框高度
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.target.id === 'translationResult') {
+                        const element = mutation.target;
+                        autoResize(element);
+                    }
+                });
+            });
+
+            observer.observe(resultDiv, {
+                childList: true,
+                characterData: true,
+                subtree: true
+            });
+
+            // 初始化时设置文本框高度
+            autoResize(sourceText);
+
+            // 在页面卸载时关闭 SSE 连接
+            window.addEventListener('beforeunload', function() {
+                if (window.translationEventSource) {
+                    window.translationEventSource.close();
+                }
+            });
+        });
+
+        function formatAnalysisContent(content) {
+            if (!content) return '';
+            
+            // 将内容按行分割
+            const lines = content.split('\n');
+            let formattedHtml = '';
+            let inList = false;
+            
+            for (let line of lines) {
+                line = line.trim();
+                if (!line) continue;
+                
+                if (line.match(/^\d+\./)) {
+                    // 处理数字编号的段落
+                    if (!inList) {
+                        formattedHtml += '<div class="analysis-section">';
+                        inList = true;
+                    }
+                    formattedHtml += `<h4 class="analysis-title">${line}</h4>`;
+                } else if (line.startsWith('-')) {
+                    // 处理破折号开头的内容
+                    const content = line.substring(1).trim();
+                    formattedHtml += `<p class="analysis-detail">${content}</p>`;
+                } else {
+                    // 处理普通段落
+                    if (inList) {
+                        formattedHtml += '</div>';
+                        inList = false;
+                    }
+                    formattedHtml += `<p class="analysis-paragraph">${line}</p>`;
+                }
+            }
+            
+            if (inList) {
+                formattedHtml += '</div>';
+            }
+            
+            return formattedHtml;
+        }
+    </script>
+</body>
+</html> 
