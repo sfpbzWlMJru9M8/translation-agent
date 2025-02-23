@@ -610,19 +610,9 @@
                                         `;
                                     }
                                     
-                                    // 显示最终思考链内容
-                                    if (result.thinking_process) {
-                                        thinkingDiv.innerHTML = `
-                                            <div class="thinking-content">
-                                                ${result.thinking_process.split('\n').map(line => 
-                                                    `<p>${line}</p>`
-                                                ).join('')}
-                                            </div>
-                                        `;
-                                    }
+                                    // 保持现有的思考链内容，不需要重新设置
                                     
                                     // 重置累积变量
-                                    accumulatedThinking = '';
                                     accumulatedAnalysis = '';
                                     currentTranslation = '';
                                     
