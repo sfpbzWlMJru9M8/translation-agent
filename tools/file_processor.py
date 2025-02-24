@@ -14,7 +14,7 @@ from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import ModelScopeEmbeddings
 import logging
 import torch
-from docx import Document
+from docx2python import docx2python  # 使用替代库
 import pandas as pd
 from tools.vector_searcher import VectorSearcher
 import nltk
@@ -180,13 +180,13 @@ class FileProcessor:
     def _process_docx(self, file_path: str) -> None:
         """处理Word文档"""
         try:
-            doc = Document(file_path)
-            text_content = []
-            
-            # 提取段落文本
-            for para in doc.paragraphs:
-                if para.text.strip():
-                    text_content.append(para.text.strip())
+            # 使用 docx2python 提取文本
+            with docx2python(file_path) as doc:
+                text_content = []
+                # 提取所有文本内容
+                for paragraph in doc.text.split('\n'):
+                    if paragraph.strip():
+                        text_content.append(paragraph.strip())
             
             # 分割文本
             chunks = self.text_splitter.split_text("\n".join(text_content))
