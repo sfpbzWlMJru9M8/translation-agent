@@ -1,0 +1,28 @@
+# 基础依赖
+python-dotenv      # 环境变量管理
+tqdm              # 进度条显示
+pathlib           # 路径处理（Python标准库）
+logging           # 日志处理（Python标准库）
+
+# 文档处理
+python-docx       # Word文档处理
+chardet           # 文件编码检测
+langchain         # LangChain主框架
+langchain-community  # LangChain社区组件
+langchain-openai    # OpenAI集成
+
+# 文档加载器相关
+docx2txt          # Word文档转文本
+unstructured      # 通用文档处理
+markdown          # Markdown处理
+
+# 向量数据库
+chromadb         # ChromaDB向量数据库
+langchain-chroma  # LangChain的ChromaDB集成
+
+# 嵌入模型
+modelscope       # ModelScope框架
+modelscope-hub   # ModelScope模型仓库
+
+# 可以使用以下命令一次性安装所有依赖：
+pip install python-dotenv tqdm python-docx chardet langchain langchain-community langchain-openai docx2txt unstructured markdown chromadb langchain-chroma modelscope modelscope-hub
