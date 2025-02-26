@@ -3,6 +3,7 @@ from tools.rag_translator import RAGTranslator
 from tools.file_processor import FileProcessor
 import os
 import json
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
@@ -131,19 +132,27 @@ def upload_file():
         if file.filename == '':
             return jsonify({'error': '没有选择文件'}), 400
             
-        # 保存上传的文件
+        # 创建上传目录
         upload_dir = './uploads'
         os.makedirs(upload_dir, exist_ok=True)
-        file_path = os.path.join(upload_dir, file.filename)
+        
+        # 保存文件
+        file_path = os.path.join(upload_dir, secure_filename(file.filename))
         file.save(file_path)
         
         # 处理文件
-        file_processor.process_files(upload_dir)
-        
-        return jsonify({'message': '文件处理成功'})
-        
+        try:
+            file_processor.process_files(upload_dir)
+            return jsonify({'message': '文件处理成功'})
+        except Exception as e:
+            return jsonify({'error': f'文件处理失败: {str(e)}'}), 500
+        finally:
+            # 清理上传文件
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                
     except Exception as e:
-        return jsonify({'error': f'文件处理失败: {str(e)}'}), 500
+        return jsonify({'error': f'文件上传失败: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5005)

@@ -567,6 +567,56 @@
             line-height: 1.6;
             color: #2c5282;
         }
+        
+        .upload-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px rgba(255, 36, 66, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 12px rgba(255, 36, 66, 0.3);
+        }
+        
+        .upload-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: 0.5s;
+        }
+        
+        .upload-btn:hover::before {
+            left: 100%;
+        }
+        
+        .upload-btn i {
+            transition: transform 0.3s ease;
+        }
+        
+        .upload-btn:hover i {
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -574,13 +624,19 @@
         <div class="translation-card">
             <div class="card-header">
                 <h1 class="card-title">游戏翻译智能体</h1>
+                <div class="upload-container">
+                    <label class="upload-btn">
+                        <i class="fas fa-file-upload"></i>
+                        <input type="file" id="fileUpload" hidden accept=".pdf,.docx,.xlsx,.txt">上传文档</label>
+                    </label>
+                </div>
             </div>
             
             <!-- 系统提示 -->
             <div class="alert-section">
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle"></i>
-                    <strong>使用提示：</strong>当前项目使用的训练数据较少，建议优先选择右侧预设术语进行体验
+                    <strong>使用提示：</strong>当前项目使用的训练数据较少，建议优先选择下方预设术语进行体验
                 </div>
             </div>
 
@@ -1031,6 +1087,43 @@
             // 在页面加载时初始化折叠状态
             toggleSection('about', true);
             toggleSection('value', true);
+
+            // 文件上传处理
+            document.getElementById('fileUpload').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                // 显示上传状态
+                const uploadBtn = document.querySelector('.upload-btn');
+                uploadBtn.innerHTML = `
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>正在处理 ${file.name}</span>
+                `;
+                
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('上传失败: ' + data.error);
+                    } else {
+                        alert('文件处理成功！已更新翻译知识库');
+                    }
+                })
+                .catch(error => {
+                    console.error('上传错误:', error);
+                    alert('文件上传失败');
+                })
+                .finally(() => {
+                    uploadBtn.innerHTML = '<i class="fas fa-file-upload"></i> 上传文件';
+                    e.target.value = '';
+                });
+            });
         });
 
         // 切换章节显示状态
