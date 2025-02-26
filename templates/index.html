@@ -405,6 +405,168 @@
             border-radius: 12px;
             padding: 16px;
         }
+        
+        .preset-section {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .preset-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .preset-term {
+            padding: 8px 12px;
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .preset-term:hover {
+            background-color: #FFE9E9;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .preset-term::before {
+            content: "🔖";
+            margin-right: 8px;
+        }
+        
+        .search-preset {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .alert-section {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            background-color: #e6f3ff;
+            color: #004085;
+        }
+        
+        .alert i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        
+        .about-section {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .section-header i {
+            margin-right: 8px;
+            transition: transform 0.3s ease;
+        }
+        
+        .collapsed .section-header i {
+            transform: rotate(-90deg);
+        }
+        
+        .collapsed #aboutContent,
+        .collapsed #valueContent {
+            display: none;
+        }
+        
+        .about-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .about-card h3 {
+            color: var(--primary-color);
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .about-card i {
+            margin-right: 8px;
+        }
+        
+        .about-card ul {
+            margin: 0;
+            padding-left: 20px;
+            columns: 2;
+            column-gap: 30px;
+        }
+        
+        .about-card li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+            break-inside: avoid-column;
+            padding-right: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .about-card ul {
+                columns: 1;
+            }
+        }
+        
+        .value-section {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+        
+        .value-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .value-card h3 {
+            color: var(--primary-color);
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .value-card i {
+            margin-right: 8px;
+        }
+        
+        .value-card ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .value-card li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+            color: #2c5282;
+        }
     </style>
 </head>
 <body>
@@ -412,6 +574,56 @@
         <div class="translation-card">
             <div class="card-header">
                 <h1 class="card-title">游戏翻译智能体</h1>
+            </div>
+            
+            <!-- 系统提示 -->
+            <div class="alert-section">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>使用提示：</strong>当前项目使用的训练数据较少，建议优先选择右侧预设术语进行体验
+                </div>
+            </div>
+
+            <!-- 项目介绍 -->
+            <div class="about-section">
+                <div class="section-header" onclick="toggleSection('about')">
+                    <i class="fas fa-chevron-down"></i>
+                    <h3><i class="fas fa-robot"></i> 项目特性</h3>
+                </div>
+                <div class="about-card" id="aboutContent">
+                    <ul>
+                        <li>基于深度求索DeepSeek-R1大语言模型</li>
+                        <li>采用RAG（检索增强生成）技术架构</li>
+                        <li>使用Chroma向量数据库存储历史翻译</li>
+                        <li>支持PDF/Word/Excel多格式文档处理</li>
+                        <li>实时展示AI翻译思考过程</li>
+                        <li>支持术语参考和翻译解析</li>
+                        <li>自动记忆历史翻译内容</li>
+                        <li>基于LangChain构建文本处理流程</li>
+                        <li>使用ModelScope中文嵌入模型</li>
+                        <li>结合游戏背景知识库的智能翻译</li>
+                        <li>支持文化差异的本地化处理</li>
+                        <li>动态更新翻译记忆库</li>
+                        <li>多维度翻译质量评估</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 项目价值 -->
+            <div class="value-section">
+                <div class="section-header" onclick="toggleSection('value')">
+                    <i class="fas fa-chevron-down"></i>
+                    <h3><i class="fas fa-star"></i> 核心价值</h3>
+                </div>
+                <div class="value-card" id="valueContent">
+                    <ul>
+                        <li>结合游戏世界观背景的精准翻译</li>
+                        <li>智能处理专有名词和文化差异</li>
+                        <li>持续优化的翻译记忆知识库</li>
+                        <li>透明化的AI翻译决策过程</li>
+                        <li>提升本地化效率达300%</li>
+                    </ul>
+                </div>
             </div>
             
             <!-- 语言选择和输入部分 -->
@@ -431,6 +643,24 @@
                     <option value="英语">英语</option>
                     <option value="日语">日语</option>
                 </select>
+            </div>
+            
+            <!-- 在语言选择部分下方添加预选内容面板 -->
+            <div class="preset-section">
+                <div class="result-header">
+                    <i class="fas fa-list"></i>
+                    <span>术语预选</span>
+                </div>
+                <div class="preset-content" id="presetTerms">
+                    <div class="preset-term" data-term="狭間の地の人">交界地居民 (inhabitants of The Lands Between)</div>
+                    <div class="preset-term" data-term="辺境人">边境民 (Fringefolk)</div>
+                    <div class="preset-term" data-term="星呼び">唤星者 (starcallers)</div>
+                    <div class="preset-term" data-term="亜人">亚人种 (demi-humans)</div>
+                    <div class="preset-term" data-term="泥人">泥人 (wretches)</div>
+                    <div class="preset-term" data-term="死に生きる者">死诞者 (those who have lived beyond death)</div>
+                    <div class="preset-term" data-term="地下墓地">地下墓地都落 (the roots of the Erdtree)</div>
+                    <div class="preset-term" data-term="放浪の民">游牧民族 (Nomad)</div>
+                </div>
             </div>
             
             <!-- 输入文本区域 -->
@@ -770,7 +1000,54 @@
                     window.translationEventSource.close();
                 }
             });
+
+            // 在DOM加载完成后添加
+            const presetTerms = document.querySelectorAll('.preset-term');
+            
+            presetTerms.forEach(term => {
+                term.addEventListener('click', function() {
+                    const selectedTerm = this.getAttribute('data-term');
+                    sourceText.value = selectedTerm;
+                    autoResize(sourceText);
+                    translateBtn.click();  // 自动触发翻译
+                });
+            });
+
+            // 添加术语搜索功能
+            const searchPreset = document.createElement('input');
+            searchPreset.placeholder = "搜索术语...";
+            searchPreset.classList.add('search-preset');
+            document.querySelector('.preset-section').insertBefore(searchPreset, document.querySelector('#presetTerms'));
+
+            // 术语搜索功能
+            searchPreset.addEventListener('input', function() {
+                const searchText = this.value.toLowerCase();
+                presetTerms.forEach(term => {
+                    const termText = term.textContent.toLowerCase();
+                    term.style.display = termText.includes(searchText) ? 'block' : 'none';
+                });
+            });
+
+            // 在页面加载时初始化折叠状态
+            toggleSection('about', true);
+            toggleSection('value', true);
         });
+
+        // 切换章节显示状态
+        function toggleSection(sectionId, forceOpen) {
+            const section = document.querySelector(`#${sectionId}Content`).parentElement;
+            const isCollapsed = section.classList.contains('collapsed');
+            
+            if (typeof forceOpen !== 'undefined') {
+                if (forceOpen) {
+                    section.classList.remove('collapsed');
+                } else {
+                    section.classList.add('collapsed');
+                }
+            } else {
+                section.classList.toggle('collapsed');
+            }
+        }
 
         function formatAnalysisContent(content) {
             if (!content) return '';
