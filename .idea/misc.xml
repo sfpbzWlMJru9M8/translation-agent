@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="fanyi" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="fanyi" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="translate_agent" project-jdk-type="Python SDK" />
 </project>

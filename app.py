@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify, render_template, Response, stream_with_context
+
+from config import Config
 from tools.rag_translator import RAGTranslator
 from tools.file_processor import FileProcessor
 import os
@@ -9,11 +11,11 @@ app = Flask(__name__)
 
 # 初始化翻译器
 translator = RAGTranslator(
-    api_key="sk-zFmodcOHRQQ2P97XlMpsENO4LOv2gB8LH0SutfLidQ3fcXgz",
+    api_key=Config.API_KEY,
     persist_dir="./document_db",
-    base_url="https://api.lkeap.cloud.tencent.com/v1",
-    model="deepseek-r1",
-    temperature=0.7
+    base_url=Config.BASE_URL,
+    model=Config.MODEL,
+    temperature=Config.TEMPERATURE
 )
 
 # 初始化文件处理器

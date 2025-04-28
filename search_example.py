@@ -8,7 +8,7 @@ available_collections = searcher.list_collections()
 print("可用的集合:", available_collections)
 
 # 在指定集合中搜索
-query = "Starscourge Radahn"
+query = ""
 results = searcher.search(
     query=query,
     collection_names=["translations",],  # 可以指定多个集合

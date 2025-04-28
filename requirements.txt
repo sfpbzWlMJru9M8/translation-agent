@@ -25,4 +25,4 @@ modelscope       # ModelScope框架
 modelscope-hub   # ModelScope模型仓库
 
 # 可以使用以下命令一次性安装所有依赖：
-pip install python-dotenv tqdm python-docx chardet langchain langchain-community langchain-openai docx2txt unstructured markdown chromadb langchain-chroma modelscope modelscope-hub
+# pip install python-dotenv tqdm python-docx chardet langchain langchain-community langchain-openai docx2txt unstructured markdown chromadb langchain-chroma modelscope modelscope-hub

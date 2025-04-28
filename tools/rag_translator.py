@@ -10,7 +10,7 @@ class RAGTranslator:
         self,
         api_key: str,
         persist_dir: str,
-        base_url: str = "https://api.lkeap.cloud.tencent.com/v1",
+        base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1",
         model: str = "deepseek-r1",
         temperature: float = 0.7,
         source_lang: str = "英语",
