@@ -72,21 +72,34 @@ python app.py
 
 ```
 translation-agent/
-├── app.py                 # 主Flask应用
-├── static/                # 静态文件（CSS, JS）
-│   ├── css/               # 样式表
-│   ├── js/                # JavaScript文件
-│   └── img/               # 图像文件
-├── templates/             # HTML模板
-├── models/                # 翻译模型
-├── services/              # 翻译服务
-│   ├── preprocessing.py   # 文本预处理
-│   ├── translation.py     # 翻译逻辑
-│   └── postprocessing.py  # 翻译优化
-├── utils/                 # 工具函数
-├── data/                  # 术语数据库
-├── tests/                 # 测试用例
-└── requirements.txt       # Python依赖
+├── app.py                        # 主Flask应用
+├── config.py                     # 配置文件
+├── document_db                   # 文档数据库
+│   ├── bf02f15b-e7b8-409b-a5be-8b3dd93c8bc4
+│   │   ├── data_level0.bin
+│   │   ├── header.bin
+│   │   ├── length.bin
+│   │   └── link_lists.bin
+│   ├── chroma.sqlite3
+│   └── translations_processed_files.json
+├── documents                     # 文档目录
+│   └── aideng.pdf
+├── example.py                    # 示例脚本
+├── process_example.py            # 处理示例脚本
+├── rag_translate_example.py      # RAG翻译示例脚本
+├── read_structure.py             # 读取项目结构脚本
+├── requirements.txt              # Python依赖
+├── search_example.py             # 搜索示例脚本
+├── templates                     # HTML模板
+│   └── index.html                # 主页模板
+├── tools                         # 工具目录
+│   ├── file_processor.py         # 文件处理器
+│   ├── rag_translator.py         # RAG翻译器
+│   └── vector_searcher.py        # 向量搜索器
+├── translation-agent-en.md       # 英文文档
+├── translation-agent-zh.md       # 中文文档
+└── uploads                       # 上传文件目录
+    └── r2.pdf
 ```
 
 #### 翻译输出格式

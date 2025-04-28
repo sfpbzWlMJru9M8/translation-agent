@@ -84,22 +84,38 @@ An intelligent translation system with context awareness and domain-specific ada
 
 #### 🧩 Project Structure
 
+```
 translation-agent/
-├── app.py                 # Main Flask application
-├── static/                # Static files (CSS, JS)
-│   ├── css/               # Stylesheets
-│   ├── js/                # JavaScript files
-│   └── img/               # Images
-├── templates/             # HTML templates
-├── models/                # Translation models
-├── services/              # Translation services
-│   ├── preprocessing.py   # Text preprocessing
-│   ├── translation.py     # Translation logic
-│   └── postprocessing.py  # Translation refinement
-├── utils/                 # Utility functions
-├── data/                  # Terminology databases
-├── tests/                 # Test cases
-└── requirements.txt       # Python dependencies
+├── app.py                        # Main Flask application
+├── config.py                     # Configuration file
+├── document_db                   # Document database
+│   ├── bf02f15b-e7b8-409b-a5be-8b3dd93c8bc4
+│   │   ├── data_level0.bin        # Binary data for document level 0
+│   │   ├── header.bin             # Header information binary
+│   │   ├── length.bin             # Length information binary
+│   │   └── link_lists.bin         # Linked list binary
+│   ├── chroma.sqlite3             # Chroma database (SQLite format)
+│   └── translations_processed_files.json # Processed translations metadata
+├── documents                     # Documents directory
+│   └── aideng.pdf                 # Example document
+├── example.py                    # Example script
+├── process_example.py            # Example processing script
+├── rag_translate_example.py      # RAG translation example script
+├── read_structure.py             # Script to read project structure
+├── requirements.txt              # Python dependencies list
+├── search_example.py             # Example search script
+├── templates                     # HTML templates directory
+│   └── index.html                # Main page template
+├── tools                         # Utility scripts
+│   ├── file_processor.py          # File processor module
+│   ├── rag_translator.py          # RAG translator module
+│   └── vector_searcher.py         # Vector searcher module
+├── translation-agent-en.md       # English documentation
+├── translation-agent-zh.md       # Chinese documentation
+└── uploads                       # Uploads directory
+    └── r2.pdf                     # Uploaded PDF file
+
+```
 
 
 
