@@ -108,10 +108,12 @@ class RAGTranslator:
             
             # 按相似度排序
             all_similar_results.sort(key=lambda x: x['similarity'], reverse=True)
-            
+
             # 格式化相似翻译
             similar_translations = self._format_similar_translations(all_similar_results[:top_k])
-            
+            print("=======================================参考内容=========================================")
+            print(similar_translations)
+            print("=========================================================================================")
             # 在使用时才进行格式化
             formatted_prompt = self.system_prompt.format(
                 source_lang=self.source_lang,
